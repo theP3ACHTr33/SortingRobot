@@ -6,14 +6,14 @@ public class BubbleSort implements Behavior{
 	
 	public void action() {
 		if (blockAValue == -1) {
-			if (MainClass.currentPos != blockAPos) {
-				MainClass.nextPos = blockAPos;
+			if (MainClass.getCurrentPos() != blockAPos) {
+				MainClass.setNextPos(blockAPos);
 			} else {
 				blockAValue = MainClass.getValue();
 			}
 		} else if (blockBValue == -1) {
-			if (MainClass.currentPos != blockBPos) {
-				MainClass.nextPos = blockBPos;
+			if (MainClass.getCurrentPos() != blockBPos) {
+				MainClass.setNextPos(blockBPos);
 			} else {
 				blockBValue = MainClass.getValue();
 			}
@@ -29,16 +29,16 @@ public class BubbleSort implements Behavior{
 		} else {
 			blockAValue = -1;
 			blockBValue = -1;
-			if (blockBPos < MainClass.NUM_OF_BLOCKS -1) {
-				blockAPos +=1;
-				blockBPos +=1;
-			} else {
+			blockAPos +=1;
+			blockBPos +=1;
+			if (blockBPos >= MainClass.NUM_OF_BLOCKS) {
 				blockAPos = 0;
 				blockBPos = 1;
 				if (!madeChanges) {
 					MainClass.isFinished = true;
 				}
 			}
+			madeChanges = false;
 		}
 	}
 	

@@ -1,23 +1,15 @@
 import lejos.nxt.Button;
-import lejos.nxt.LCD;
 import lejos.robotics.subsumption.Behavior;
 
 public class Reset implements Behavior {
 	public void action() {
-		LCD.drawString("res", 0, 6);
-		LCD.refresh();
-		if (MainClass.currentPos == -1) {
-			//Button.ENTER.waitForPressAndRelease();
-			//MainClass.isFinished = false;
-			//MainClass.sortIndex = (MainClass.sortIndex + 1) % MainClass.NUM_OF_SORTS;
-			
+		if (MainClass.getCurrentPos() == -1) {
 			if (Button.ENTER.isDown()) {
-				MainClass.movementStack.addNode(1,2);
-				//MainClass.isFinished = false;
-				//MainClass.sortIndex = (MainClass.sortIndex + 1) % MainClass.NUM_OF_SORTS;
+				MainClass.isFinished = false;
+				MainClass.sortIndex = (MainClass.sortIndex + 1) % MainClass.NUM_OF_SORTS;
 			}
 		} else {
-			MainClass.nextPos = -1;
+			MainClass.setNextPos(-1);
 		}
 	}
 	
@@ -26,7 +18,6 @@ public class Reset implements Behavior {
 	}
 	
 	public boolean takeControl() {
-		//return (MainClass.isFinished);
-		return(MainClass.movementStack.getLength() == 0);
+		return (MainClass.isFinished);
 	}
 }

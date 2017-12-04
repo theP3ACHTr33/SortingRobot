@@ -1,4 +1,3 @@
-
 public class MovStack {
 	private MovNode top;
 	private int length = 0;

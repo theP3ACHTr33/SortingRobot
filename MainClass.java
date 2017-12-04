@@ -8,33 +8,28 @@ import lejos.robotics.subsumption.Arbitrator;
 import lejos.robotics.subsumption.Behavior;
 
 public class MainClass {
-	public static final int NUM_OF_SORTS = 2;
-	public static final int NUM_OF_BLOCKS = 4;
+	public static final int NUM_OF_SORTS = 1;
+	public static final int NUM_OF_BLOCKS = 3;
 	public static final int MAX_SPEED = 100;
 	public static final double WHEEL_DIAMETER = 55;
 	public static final double AXEL_LENGTH = 138;
-	
-	public static boolean isFinished = false;
+	public static final int GRAB_DIST = 100;
 	
 	public static LightSensor ls = new LightSensor(SensorPort.S1);
-	public static int movingStage = 0;
-	public static int greyDist = 0;
-	public static int currentPos = -1;
-	public static int nextPos = 1;
-	public static boolean facingPositive = true;
-	
-	public static final int GRAB_DIST = 100;
 	public static DifferentialPilot pilot = new DifferentialPilot(MainClass.WHEEL_DIAMETER, MainClass.AXEL_LENGTH, Motor.B, Motor.A);
+	
+	public static boolean isFinished = false;
+	public static int sortIndex = 0;
+	
+	private static int currentPos = -1;
+	private static int nextPos = -1;
+	
 	public static boolean isClawOpen = true;
 	public static boolean openClaw = true;
-	public static int clawStage = 0;
 	
 	public static MovStack movementStack = new MovStack();
-	public static int movBlockStage = 0;
 	
-//	public static int sortIndex = 0;
-	
-	public static int[] Values = {4,3,2,1};
+	public static int[] Values = {1,2,3};
 	
 	public static void main(String[] args) {
 		//Calabrate Light Sensor
@@ -49,11 +44,15 @@ public class MainClass {
 		
 		//##change claw to start pos
 		
+		//Display current and next pos (is updated by set and get methods)
+		LCD.drawString("Cpos:-1", 0, 0);
+		LCD.drawString("Npos:-1", 0, 1);
+		LCD.refresh();
+		
 		Behavior[] ba = {
-				//new TestBackForward(),
 				new BubbleSort(),
 				new MoveBlocks(),
-				//new Reset(),
+				new Reset(),
 				new Claw(),
 				new NextPos()
 		};
@@ -62,6 +61,7 @@ public class MainClass {
 		arb.start();
 	}
 	
+	//For Calibration
 	private static int[] getHighLow(String message) {
 		int reading, low, high;
 		
@@ -85,17 +85,39 @@ public class MainClass {
 			LCD.refresh();
 		}
 		LCD.clear();
-		LCD.refresh();
 		return new int[] {low,high};
 	}
 	
+	/////TEMP - instead of sensing values
 	public static int getValue() {
 		return Values[currentPos];
 	}
-	
+	/////TEMP - instead of sensing values - while sorting
 	public static void switchValues(int index1, int index2) {
 		int temp = Values[index1];
 		Values[index1] = Values[index2];
 		Values[index2] = temp;
+	}
+	
+	public static void setCurrentPos(int newPos) {
+		if (newPos != currentPos) {
+			currentPos = newPos;
+			LCD.drawInt(currentPos, 5, 0);
+			LCD.refresh();
+		}
+	}
+	public static int getCurrentPos() {
+		return currentPos;
+	}
+
+	public static void setNextPos(int newPos) {
+		if (newPos != nextPos) {
+			nextPos = newPos;
+			LCD.drawInt(nextPos, 5, 1);
+			LCD.refresh();
+		}
+	}
+	public static int getNextPos() {
+		return nextPos;
 	}
 }
