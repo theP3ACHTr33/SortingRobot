@@ -2,18 +2,27 @@ import lejos.robotics.subsumption.Behavior;
 
 public class MoveBlocks implements Behavior {	
 	public void action() {
+		//if claw is open
 		if (MainClass.isClawOpen) {
-			if (MainClass.getCurrentPos() != MainClass.movementStack.getFromPos()) {
-				MainClass.setNextPos(MainClass.movementStack.getFromPos());
+			//if position of robot doesnt equal movementQueue.getFromPos() [first node in the linked list of movements]
+			if (MainClass.getCurrentPos() != MainClass.movementQueue.getFromPos()) {
+				//go to movementQueue.getFromPos()
+				MainClass.setNextPos(MainClass.movementQueue.getFromPos());
+				//if position of robot equals movementQueue.getFromPos()
 			} else {
+				//grab object
 				MainClass.openClaw = false;
 			}
+		//if claw is NOT open
 		} else {
-			if (MainClass.getCurrentPos() != MainClass.movementStack.getToPos()) {
-				MainClass.setNextPos(MainClass.movementStack.getToPos());
+			//same as above but for ToPos
+			if (MainClass.getCurrentPos() != MainClass.movementQueue.getToPos()) {
+				MainClass.setNextPos(MainClass.movementQueue.getToPos());
 			} else {
+				//release object
 				MainClass.openClaw = true;
-				MainClass.movementStack.remove();
+				//movement is complete so remove from movementQueue
+				MainClass.movementQueue.removeNode();
 			}
 		}
 	}
@@ -23,7 +32,7 @@ public class MoveBlocks implements Behavior {
 	}
 	
 	public boolean takeControl() {
-		return (MainClass.movementStack.getLength() > 0);
+		//if there are movements to be done
+		return (!MainClass.movementQueue.isEmpty());
 	}
-
 }

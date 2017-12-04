@@ -13,22 +13,36 @@ public class MainClass {
 	public static final int MAX_SPEED = 75;
 	public static final double WHEEL_DIAMETER = 55;
 	public static final double AXEL_LENGTH = 137.75;
+	//Distance that pilot goes forward when grabbing item
 	public static final int GRAB_DIST = 200;
 	
 	public static LightSensor ls = new LightSensor(SensorPort.S1);
 	public static DifferentialPilot pilot = new DifferentialPilot(MainClass.WHEEL_DIAMETER, MainClass.AXEL_LENGTH, Motor.B, Motor.A);
 	
+	//Has algorithm finished
 	public static boolean isFinished = false;
+	//for alternating sorting algorithms (for when more than one)
 	public static int sortIndex = 0;
 	
+	//Current position
 	private static int currentPos = -1;
+	//Position to go to (NextPos behaviour moves to this position)
 	private static int nextPos = -1;
+	//Direction robot is facing (0 = facing positive, 1 = facing objects, 2 = facing negative)
+	public static int facing = 0;
 	
+	//Is claw open
 	public static boolean isClawOpen = true;
+	//What claw is changed to next time Claw behaviour is executed
 	public static boolean openClaw = true;
 	
-	public static MovStack movementStack = new MovStack();
+	//A linked list array of moving an object into blank spot
+	//movementQueue.addNode(int fromPos, int toPos)
+	//Behavior MovQueue does 1) go to fromPos 2) close claw
+	//3) go to toPos 4) open claw 5) delete that instruction from liked list
+	public static MovQueue movementQueue = new MovQueue();
 	
+	//Hard coded values to be sorted
 	public static int[] Values = {3,2,1};
 	
 	public static void main(String[] args) {
@@ -51,11 +65,18 @@ public class MainClass {
 		LCD.refresh();
 		
 		Behavior[] ba = {
+				//The sorting algorithm
 				new BubbleSort(),
+				//Moving ojects around
 				new MoveBlocks(),
+				//for when algorithm is finished
 				new Reset(),
+				//working the claw
 				new Claw(),
-				new NextPos()
+				//moving along line
+				new NextPos(),
+				//rotating robot
+				new Rotate()
 		};
 		Arbitrator arb = new Arbitrator(ba);
 		
@@ -99,6 +120,8 @@ public class MainClass {
 		Values[index1] = Values[index2];
 		Values[index2] = temp;
 	}
+	
+	//setters and getters are so LCD can be updated
 	
 	public static void setCurrentPos(int newPos) {
 		if (newPos != currentPos) {
