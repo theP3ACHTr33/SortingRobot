@@ -1,0 +1,65 @@
+import java.io.DataInputStream; 
+import java.io.DataOutputStream;
+
+import lejos.robotics.subsumption.Behavior;
+
+import lejos.nxt.LCD;
+import lejos.nxt.comm.BTConnection;
+import lejos.nxt.comm.Bluetooth;
+import lejos.nxt.comm.NXTConnection;
+
+public class BluToothConnect implements Behavior {	
+	public static BTConnection connect = null; 
+	public static DataInputStream in; 
+	public static DataOutputStream out; 
+	
+	public void action() {
+		byte[] buffer = new byte[1];
+		BluToothConnect.connect = Bluetooth.waitForConnection(0,  NXTConnection.RAW);
+		LCD.drawString("Connected", 0, 0);
+		
+		
+		int currIndex = -1; 
+		int i = 0; 
+		while (i < MainClass.Values.length && currIndex == -1 ) { 
+			if (MainClass.Values[i] == -1) { 
+				currIndex = i; 
+			}
+			i++; 
+		}
+		if(MainClass.getCurrentPos() != currIndex) { 
+			MainClass.setNextPos(currIndex);
+		} else  {
+			//travel to can from spot 
+			MainClass.pilot.rotate(90, true); 
+			MainClass.pilot.travel(MainClass.GRAB_DIST,true);  
+			
+			//bluetooth stuff below 
+				if (connect != null) {
+					if (connect.available() > 0) {
+						MainClass.Values[currIndex] = connect.read(buffer, 1); //or maybe use btrecieve? could also be problem with buffer array 
+					}
+				}
+			//bluetooth stuff above
+			
+			//travel from can back to spot 
+			MainClass.pilot.travel(-MainClass.GRAB_DIST,true);
+			MainClass.pilot.rotate(-90, true);
+		}
+		 
+	}
+	
+	public void suppress() {
+		
+	}
+	
+	public boolean takeControl() {
+		for(int i = 0; i < MainClass.Values.length; i++) { 
+			if(MainClass.Values[i] == -1) { 
+				return true; 
+			}
+		}
+		return false; 
+	}
+
+}
